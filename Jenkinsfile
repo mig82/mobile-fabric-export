@@ -39,6 +39,7 @@ node('mobilefabric') {
 		sh("rm -rf ${gitProject}")
 		sh("rm -rf export")
 		sh("rm -rf pretty")
+		sh("rm json-files-found.txt")
 	}
 	
 	stage('Clone Git repo'){
