@@ -6,8 +6,10 @@ node('mobilefabric') {
 	def mfCredId = MF_CREDENTIALS
 	def mfAccountId = MOBILE_FABRIC_ACCOUNT_ID
 	def mfAppId = MOBILE_FABRIC_APP_ID
-	//def javaLibsS3Path = JAVA_LIBS_S3_PATH //s3://kony-ci0001-storage1/libraries/kony-appfactory-libraries/
-
+	def mfCliLocation = MF_CLI_LOCATION //HTTPS or S3
+	def mfcliS3Url = MF_CLI_S3_URL //s3://your-s3-name/some/path/mfcli.jar
+	def mfcliHttpsUrl = MF_CLI_HTTPS_URL //https://s3.amazonaws.com/plugins-updatesite-prod/onpremise/mobilefabric/mabilefabricCI/7.1.1.0/mfcli.jar
+	
 	stage('Validate input parameters'){
 		echo exportRepoUrl
 		def gitParams = exportRepoUrl.split('/')
@@ -64,7 +66,13 @@ node('mobilefabric') {
 	}
 
 	stage("Export from Mobile Fabric"){
-		sh("aws s3 cp ${javaLibsS3Path}/mfcli.jar ./")
+		if(mfCliLocation == "S3"){
+			sh("aws s3 cp ${mfcliS3Url} ./")
+		}
+		else{
+			sh("curl -o mfcli.jar ${mfcliHttpsUrl}")
+		}
+		
 		
 		withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: mfCredId, usernameVariable: 'mfUser', passwordVariable: 'mfPassword']]) {		
 			sh("java -jar mfcli.jar export -t ${mfAccountId} -u ${mfUser} -p ${mfPassword} -a ${mfAppId} -f ${gitProject}.zip")
