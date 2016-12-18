@@ -96,6 +96,13 @@ node('mobilefabric') {
 		
 		//Prettify all JSON files found.
 		def jsonFilePaths = readFile("json-files-found.txt").split("\n")
+		echo("JSON files found: ${jsonFilePaths}")
+		for(int k = 0; k < jsonFilePaths.size(); k++){
+			def jsonPath = jsonFilePaths[k]
+			echo("File: ${jsonPath}")
+			def pretty = mfJsonParser.prettify(readFile(jsonPath))
+			echo("Pretty: ${pretty}")
+		} 
 		for (String jsonPath : jsonFilePaths) {
 			echo(jsonPath)
 			def pretty = mfJsonParser.prettify(readFile(jsonPath))
