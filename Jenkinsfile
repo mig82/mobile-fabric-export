@@ -6,7 +6,7 @@ node('mobilefabric') {
 	def mfCredId = MF_CREDENTIALS
 	def mfAccountId = MOBILE_FABRIC_ACCOUNT_ID
 	def mfAppId = MOBILE_FABRIC_APP_ID
-	def javaLibsS3Path = JAVA_LIBS_S3_PATH //s3://kony-ci0001-storage1/libraries/kony-appfactory-libraries/
+	//def javaLibsS3Path = JAVA_LIBS_S3_PATH //s3://kony-ci0001-storage1/libraries/kony-appfactory-libraries/
 
 	stage('Validate input parameters'){
 		echo exportRepoUrl
