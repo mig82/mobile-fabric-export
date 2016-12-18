@@ -102,13 +102,9 @@ node('mobilefabric') {
 			echo("File: ${jsonPath}")
 			def pretty = mfJsonParser.prettify(readFile(jsonPath))
 			echo("Pretty: ${pretty}")
-		} 
-		for (String jsonPath : jsonFilePaths) {
-			echo(jsonPath)
-			def pretty = mfJsonParser.prettify(readFile(jsonPath))
-			echo(pretty)
 		}
 
+		//Copy the original exports and the prettified copies to local git repo.
 		sh("mv -f ./export ./${gitProject}/export")
 		sh("mv -f ./pretty ./${gitProject}/pretty")
 		sh("""
