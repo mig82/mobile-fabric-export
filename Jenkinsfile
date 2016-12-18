@@ -143,7 +143,7 @@ node('mobilefabric') {
 					echo "Changes found."
 					sh ("""
 						git commit -m 'Updates definitions of Mobile Fabric services'
-						git push ${gitProtocol}//${GIT_USERNAME}:${encodedGitPassword}@${gitDomain}/${orgName}/${gitProject}.git
+						git push ${gitProtocol}//${gitUser}:${encodedGitPassword}@${gitDomain}/${orgName}/${gitProject}.git
 					""")
 					echo "Done pushing changes."
 				}
