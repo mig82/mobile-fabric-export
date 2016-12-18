@@ -74,11 +74,25 @@ node('mobilefabric') {
 	}
 
 	stage("Prettify JSON defs"){
-		sh("aws s3 cp ${javaLibsS3Path}/PrettyJSON.jar ./")
-		sh("find ./export -type f -name *.json")
+		
+		def mfJsonParser = load("./mfJsonParser.groovy")
+		echo "Done loading mfJsonParser.groovy script"
+		
+		/* Copy the exported files to a new directory in order to prettify.
+		We avoid overwritting the originals in case we want to use them to import again.*/
 		sh("cp -R ./export ./pretty")
-		sh("java -jar PrettyJSON.jar ./pretty")
-		sh("find ./pretty -type f -name *.json")
+		
+		//Create a list of all the JSON files we have to prettify.
+		sh("find ./pretty -type f -name *.json > json-files-found.txt")
+		
+		//Prettify all JSON files found.
+		def jsonFilePaths = readFile("json-files-found.txt").split("\n")
+		for (String jsonPath : jsonFilePaths) {
+			echo(jsonPath)
+			def pretty = mfJsonParser.prettify(readFile(jsonPath))
+			echo(pretty)
+		}
+
 		sh("mv -f ./export ./${gitProject}/export")
 		sh("mv -f ./pretty ./${gitProject}/pretty")
 		sh("""
