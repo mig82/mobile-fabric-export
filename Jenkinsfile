@@ -133,7 +133,7 @@ node('mobilefabric') {
 				""")
 				//Check whether there are in fact any changes to commit.
 				def dirty = sh (
-					script: "git diff --exit-code",
+					script: "git diff --cached --exit-code",
 					returnStatus: true
 				) != 0
 				// dirty != 0 => There are changes to push.
