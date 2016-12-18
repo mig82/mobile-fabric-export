@@ -38,6 +38,7 @@ node('mobilefabric') {
 	stage("Clean up"){
 		sh("rm -rf ${gitProject}")
 		sh("rm -rf export")
+		sh("rm -rf pretty")
 	}
 	
 	stage('Clone Git repo'){
