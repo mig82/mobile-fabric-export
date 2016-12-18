@@ -83,7 +83,8 @@ node('mobilefabric') {
 
 	stage("Prettify JSON defs"){
 		
-		def mfJsonParser = load("mfJsonParser.groovy")
+		def workspace = pwd() 
+		def mfJsonParser = load("${workspace}@script/mfJsonParser.groovy")
 		echo "Done loading mfJsonParser.groovy script"
 		
 		/* Copy the exported files to a new directory in order to prettify.
