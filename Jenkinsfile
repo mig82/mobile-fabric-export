@@ -123,36 +123,33 @@ node('mobilefabric') {
 			//If password contains '@' character it must be encoded to avoid being mistaken by the '@' that separates user:password@url expression.
 			String encodedGitPassword = gitPassword.contains("@") ? URLEncoder.encode(gitPassword) : gitPassword
 
-			//Add changes and commit.
-			def dirty = sh (
-				script: """
-					pwd
-					ls -la
-					cd ${gitProject}
-					pwd
-					ls -la
-					git diff --exit-code
-				""",
-				returnStatus: true
-			) != 0
-
-			// dirty != 0 => There are changes to push.
-			echo "dirty=${dirty}"
-
-			if(dirty){
-				echo "Changes found."
-				sh ("""
-					cd ${gitProject}
+			dir(gitProject){
+				//Check status and stage all changes for commit.
+				sh("""
 					git status
 					git add .
-					git commit -m 'Updates definitions of Mobile Fabric services'
-					git push ${gitProtocol}//${GIT_USERNAME}:${encodedGitPassword}@${gitDomain}/${orgName}/${gitProject}.git
+					git status
 				""")
-				echo "Done pushing changes."
+				//Check whether there are in fact any changes to commit.
+				def dirty = sh (
+					script: "git diff --exit-code",
+					returnStatus: true
+				) != 0
+				// dirty != 0 => There are changes to push.
+				echo "dirty=${dirty}"
+				
+				if(dirty){
+					echo "Changes found."
+					sh ("""
+						git commit -m 'Updates definitions of Mobile Fabric services'
+						git push ${gitProtocol}//${GIT_USERNAME}:${encodedGitPassword}@${gitDomain}/${orgName}/${gitProject}.git
+					""")
+					echo "Done pushing changes."
+				}
+				else {
+					echo "No changes to commit."
+				}
 			}
-			else {
-				echo "No changes to commit."
-			}  
 		}
 	}
 	
