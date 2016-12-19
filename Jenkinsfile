@@ -39,7 +39,7 @@ node('mobilefabric') {
 		sh("rm -rf ${gitProject}")
 		sh("rm -rf export")
 		sh("rm -rf pretty")
-		sh("rm json-files-found.txt")
+		sh("rm -f json-files-found.txt")
 	}
 	
 	stage('Clone Git repo'){
@@ -75,7 +75,6 @@ node('mobilefabric') {
 			sh("curl -o mfcli.jar ${mfcliHttpsUrl}")
 		}
 		
-		
 		withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: mfCredId, usernameVariable: 'mfUser', passwordVariable: 'mfPassword']]) {		
 			sh("java -jar mfcli.jar export -t ${mfAccountId} -u ${mfUser} -p ${mfPassword} -a ${mfAppId} -f ${gitProject}.zip")
 			sh("unzip ${gitProject}.zip -d ./export")
@@ -86,33 +85,41 @@ node('mobilefabric') {
 	stage("Prettify JSON defs"){
 		
 		def workspace = pwd() 
-		def mfJsonParser = load("${workspace}@script/mfJsonParser.groovy")
-		echo "Done loading mfJsonParser.groovy script"
+		def MfJsonParser = load("${workspace}@script/MfJsonParser.groovy")
+		def PathHelper = load("${workspace}@script/PathHelper.groovy")
+		echo "Done loading Groovy modules"
 		
 		/* Copy the exported files to a new directory in order to prettify.
 		We avoid overwritting the originals in case we want to use them to import again.*/
-		sh("cp -R ./export ./pretty")
+		//sh("cp -R ./export ./pretty")
 		
 		//Create a list of all the JSON files we have to prettify.
-		sh("find ./pretty -type f -name *.json > json-files-found.txt")
+		//sh("find ./pretty -type f -name *.json > json-files-found.txt")
+		sh("find ./export -type f -name *.json > json-files-found.txt")
 		
 		//Prettify all JSON files found.
 		def jsonFilePaths = readFile("json-files-found.txt").split("\n")
 		echo("JSON files found: ${jsonFilePaths}")
+		
 		for(int k = 0; k < jsonFilePaths.size(); k++){
 			def jsonPath = jsonFilePaths[k]
 			echo("File: ${jsonPath}")
-			def pretty = mfJsonParser.prettify(readFile(jsonPath))
+			def pretty = MfJsonParser.prettify(readFile(jsonPath))
 			echo("Pretty: ${pretty}")
+			def prettyJsonPath = PathHelper.getPrettyFilePathName(jsonPath)
 			writeFile(
-				file: jsonPath,
+				//file: jsonPath,
+				file: prettyJsonPath,
 				text: pretty
 			)
 		}
 
-		//Copy the original exports and the prettified copies to local git repo.
-		sh("mv -f ./export ./${gitProject}/export")
-		sh("mv -f ./pretty ./${gitProject}/pretty")
+		//Overwrite existing exports with newly exported and prettified ones.
+		sh("""
+			rm -rf ./${gitProject}/export
+			mv -f ./export ./${gitProject}/
+		""")
+		//sh("mv -f ./pretty ./${gitProject}/pretty")
 		sh("""
 			cd ${gitProject}
 			pwd
