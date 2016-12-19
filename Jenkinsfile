@@ -114,8 +114,11 @@ node('mobilefabric') {
 			)
 		}
 
-		//Copy the original exports and the prettified copies to local git repo.
-		sh("mv -f ./export ./${gitProject}/export")
+		//Overwrite existing exports with newly exported and prettified ones.
+		sh("""
+			rm -rf ./${gitProject}/export
+			mv -f ./export ./${gitProject}/
+		""")
 		//sh("mv -f ./pretty ./${gitProject}/pretty")
 		sh("""
 			cd ${gitProject}
