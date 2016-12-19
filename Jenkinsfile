@@ -114,7 +114,7 @@ node('mobilefabric') {
 			def jsonPath = jsonFilePaths[k]
 			echo("File: ${jsonPath}")
 			def pretty = MfJsonParser.prettify(readFile(jsonPath))
-			echo("Pretty: ${pretty}")
+			//echo("Pretty: ${pretty}")
 			def prettyJsonPath = PathHelper.getPrettyFilePathName(jsonPath)
 			writeFile(
 				//file: jsonPath,
