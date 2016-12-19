@@ -1,3 +1,14 @@
+def MfJsonParser, PathHelper
+
+node{
+	stage('Load Groovy modules'){
+		def workspace = pwd() 
+		MfJsonParser = load("${workspace}@script/MfJsonParser.groovy")
+		PathHelper = load("${workspace}@script/PathHelper.groovy")
+		echo "Done loading Groovy modules"
+	}
+}
+
 node('mobilefabric') {
 	def gitProtocol, gitDomain, orgName, gitProject
 	def gitCredId = GIT_CREDENTIALS //Credentials parameter
@@ -6,9 +17,7 @@ node('mobilefabric') {
 	def mfCredId = MF_CREDENTIALS
 	def mfAccountId = MOBILE_FABRIC_ACCOUNT_ID
 	def mfAppId = MOBILE_FABRIC_APP_ID
-	def mfCliLocation = MF_CLI_LOCATION //HTTPS or S3
-	def mfcliS3Url = MF_CLI_S3_URL //s3://your-s3-name/some/path/mfcli.jar
-	def mfcliHttpsUrl = MF_CLI_HTTPS_URL //https://s3.amazonaws.com/plugins-updatesite-prod/onpremise/mobilefabric/mabilefabricCI/7.1.1.0/mfcli.jar
+	def mfCliLocation = MF_CLI_LOCATION //HTTPS or S3 URL to fetch mfcli.jar from.
 	
 	stage('Validate input parameters'){
 		echo exportRepoUrl
@@ -68,11 +77,11 @@ node('mobilefabric') {
 	}
 
 	stage("Export from Mobile Fabric"){
-		if(mfCliLocation == "S3"){
-			sh("aws s3 cp ${mfcliS3Url} ./")
+		if(mfCliLocation.startsWith("s3")){
+			sh("aws s3 cp ${mfCliLocation} ./")
 		}
 		else{
-			sh("curl -o mfcli.jar ${mfcliHttpsUrl}")
+			sh("curl -o mfcli.jar ${mfCliLocation}")
 		}
 		
 		withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: mfCredId, usernameVariable: 'mfUser', passwordVariable: 'mfPassword']]) {		
@@ -84,10 +93,10 @@ node('mobilefabric') {
 
 	stage("Prettify JSON defs"){
 		
-		def workspace = pwd() 
-		def MfJsonParser = load("${workspace}@script/MfJsonParser.groovy")
-		def PathHelper = load("${workspace}@script/PathHelper.groovy")
-		echo "Done loading Groovy modules"
+		sh("""
+			pwd
+			ls -la
+		""")
 		
 		/* Copy the exported files to a new directory in order to prettify.
 		We avoid overwritting the originals in case we want to use them to import again.*/
