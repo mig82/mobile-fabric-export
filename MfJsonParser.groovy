@@ -7,27 +7,33 @@ def prettify(txt){
 	println("Orig content: ${txt}")
 	
 	def slurper = new JsonSlurper()
+	println("Created slurper")
 	
 	def obj = slurper.parseText(txt)
+	println("Parsed object of type ${obj.getClass()}")
+	println("Basic parse: ${obj}")
 	
-	if(obj.config != null){
-		def config = obj.config
-		assert config instanceof String
-		obj.config = slurper.parseText(config)
+	if(obj instanceof Map){
+		if(obj.config != null && obj.config instanceof String){
+			def config = obj.config
+			//assert config instanceof String
+			obj.config = slurper.parseText(config)
+		}
+		
+		if(obj.policyConfig != null && obj.policyConfig instanceof String){
+			def policyConfig = obj.policyConfig
+			//assert policyConfig instanceof String
+			obj.policyConfig = slurper.parseText(policyConfig)
+		}
 	}
+	println("Final parse: ${obj}")
 	
-	if(obj.policyConfig != null){
-		def policyConfig = obj.policyConfig
-		assert policyConfig instanceof String
-		obj.policyConfig = slurper.parseText(policyConfig)
-	}
+	String json = JsonOutput.toJson(obj)
+	println("JSONified content: ${json}")
 	
-	println("Parsed object: ${obj}")
-	
-	def pretty = JsonOutput.prettyPrint(JsonOutput.toJson(obj))
+	def pretty = JsonOutput.prettyPrint(json)
 	println("Prettified content: ${pretty}")
 	
 	return pretty
 }
-
 return this;
