@@ -19,8 +19,11 @@ This script will do the following tasks:
     java -jar mfcli.jar export
 
 2. Unzip the contents of the export.
+
 3. Determine whether there are any changes.
+
 4. Prettify the *Meta.json* files which define the configuration parameters for each service.
+
 5. Configure local git user to push changes in your name.
 
     git config --local user.name [name]
@@ -46,14 +49,22 @@ This script will do the following tasks:
 In order **to use this job you don't have to do anything with this repository**. You just have to create a Jenkins job that uses the scripts here to back up and version the Mobile Fabric services for your app.
 
 1. Create a Jenkins Pipeline job that pulls from this repo.
-1. Add an input parameter called *MF_CLI_LOCATION* of type String and set it to the download url of the Kony mfcli.jar.
-2. Add an input parameter called *EXPORT_REPO_URL* of type String.
-3. Add an input parameter called *GIT_CREDENTIALS* of type Credentials.
-4. Add an input parameter called *MOBILE_FABRIC_APP_ID* of type String.
-5. Add an input parameter called *MF_CREDENTIALS* of type Credentials.
-6. Add an input parameter called *COMMIT_AUTHOR* of type String.
-6. Add an input parameter called *AUTHOR_EMAIL* of type String.
-6. Add an input parameter called *COMMIT_MESSAGE* of type String.
+
+2. Add an input parameter called *MF_CLI_LOCATION* of type String and set it to the download url of the Kony mfcli.jar.
+
+3. Add an input parameter called *EXPORT_REPO_URL* of type String.
+
+4. Add an input parameter called *GIT_CREDENTIALS* of type Credentials.
+
+5. Add an input parameter called *MOBILE_FABRIC_APP_ID* of type String.
+
+6. Add an input parameter called *MF_CREDENTIALS* of type Credentials.
+
+7. Add an input parameter called *COMMIT_AUTHOR* of type String.
+
+8. Add an input parameter called *AUTHOR_EMAIL* of type String.
+
+9. Add an input parameter called *COMMIT_MESSAGE* of type String.
 
 Then, as you work on your services, every time you've made and tested a change to your Mobile Fabric services and wish to save your progress, go to your Jenkins Console and run this job.
 
